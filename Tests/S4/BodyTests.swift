@@ -38,20 +38,49 @@ class BodyTests: XCTestCase {
         var bodyForReceiver = body
         var bodyForSender = body
 
-        XCTAssert(data == bodyForBuffer.buffer, "Garbled buffer bytes")
+        XCTAssert(data == (try! bodyForBuffer.becomeBuffer()), "Garbled buffer bytes")
+        switch bodyForBuffer {
+        case .buffer(let d):
+            XCTAssert(data == d, "Garbled buffer bytes")
+        default:
+            XCTFail("Incorrect type")
+        }
 
         bodyForReceiver.forceReopenDrain()
-        let receiverDrain = Drain(bodyForReceiver.receiver) //must open because of reference semantics
+        let receiverDrain = Drain(try! bodyForReceiver.becomeReceiver())
         XCTAssert(data == receiverDrain.data, "Garbled receiver bytes")
+        switch bodyForReceiver {
+        case .receiver(let stream):
+            bodyForReceiver.forceReopenDrain()
+            let receiverDrain = Drain(stream)
+            XCTAssert(data == receiverDrain.data, "Garbed receiver bytes")
+        default:
+            XCTFail("Incorrect type")
+        }
 
 
         let senderDrain = Drain()
         bodyForReceiver.forceReopenDrain()
         do {
-            try bodyForSender.sender(senderDrain)
-            XCTAssert(data == senderDrain.data, "Garbled sender bytes")
+            try bodyForSender.becomeSender()(senderDrain)
+
         } catch {
             XCTFail("Drain threw error \(error)")
+        }
+        XCTAssert(data == senderDrain.data, "Garbled sender bytes")
+
+        switch bodyForSender {
+        case .sender(let closure):
+            let senderDrain = Drain()
+            bodyForReceiver.forceReopenDrain()
+            do {
+                try closure(senderDrain)
+            } catch {
+                XCTFail("Drain threw error \(error)")
+            }
+            XCTAssert(data == senderDrain.data, "Garbed sender bytes")
+        default:
+            XCTFail("Incorrect type")
         }
     }
 
@@ -59,7 +88,7 @@ class BodyTests: XCTestCase {
 
 extension Body {
     mutating func forceReopenDrain() {
-        if let drain = self.receiver as? Drain {
+        if let drain = (try! self.becomeReceiver()) as? Drain {
             drain.closed = false
         }
     }
