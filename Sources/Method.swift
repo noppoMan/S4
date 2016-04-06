@@ -93,5 +93,5 @@ extension Method: Hashable {
 }
 
 public func ==(lhs: Method, rhs: Method) -> Bool {
-    return lhs.hashValue == rhs.hashValue
+    return lhs.description == rhs.description
 }
