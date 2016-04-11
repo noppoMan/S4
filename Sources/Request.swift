@@ -4,7 +4,7 @@ public struct Request: Message {
     public var version: Version
     public var headers: Headers
     public var body: Body
-    public var storage: Storage = [:]
+    public var storage: [String: Any] = [:]
 
     public init(method: Method, uri: URI, version: Version, headers: Headers, body: Body) {
         self.method = method
@@ -15,7 +15,29 @@ public struct Request: Message {
     }
 }
 
+public protocol RequestInitializable {
+    init(request: Request)
+}
+
+public protocol RequestRepresentable {
+    var request: Request { get }
+}
+
+public protocol RequestConvertible: RequestInitializable, RequestRepresentable {}
+
 extension Request {
+    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Data = []) {
+        self.init(
+            method: method,
+            uri: uri,
+            version: Version(major: 1, minor: 1),
+            headers: headers,
+            body: .buffer(body)
+        )
+
+        self.headers["Content-Length"] += body.count.description
+    }
+
     public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Stream) {
         self.init(
             method: method,
@@ -26,18 +48,6 @@ extension Request {
         )
 
         self.headers["Transfer-Encoding"] = "chunked"
-    }
-
-    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Data = nil) {
-        self.init(
-            method: method,
-            uri: uri,
-            version: Version(major: 1, minor: 1),
-            headers: headers,
-            body: .buffer(body)
-        )
-
-        self.headers["Content-Length"] = HeaderValues(body.count.description)
     }
 
     public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Stream throws -> Void) {
