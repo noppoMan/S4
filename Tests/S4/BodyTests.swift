@@ -33,7 +33,7 @@ class BodyTests: XCTestCase {
         testBodyProperties(buffer)
     }
 
-    private func testBodyProperties(body: Body) {
+    private func testBodyProperties(_ body: Body) {
         var bodyForBuffer = body
         var bodyForReceiver = body
         var bodyForSender = body

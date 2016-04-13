@@ -1,3 +1,3 @@
 public protocol RequestParser {
-    func parse(data: Data) throws -> Request?
+    func parse(_ data: Data) throws -> Request?
 }
