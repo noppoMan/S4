@@ -1,3 +1,3 @@
 public protocol ResponseParser {
-    func parse(data: Data) throws -> Response?
+    func parse(_ data: Data) throws -> Response?
 }

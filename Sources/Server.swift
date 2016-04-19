@@ -1,5 +1,5 @@
 public protocol Server {
-    func serve(responder: Responder, on host: String, at port: Int) throws
+    func serve(_ responder: Responder, on host: String, at port: Int) throws
 }
 
 extension Server {
