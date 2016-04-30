@@ -1,9 +1,10 @@
 public protocol Server {
-    func serve(_ responder: Responder, on host: String, at port: Int) throws
+    init(host: String, port: Int, responder: Responder) throws
+    func start() throws
 }
 
 extension Server {
-    public func serve(responder: Responder, at port: Int) throws {
-        try self.serve(responder, on: "0.0.0.0", at: port)
+    public init(port: Int, responder: Responder) throws {
+        try self.init(host: "0.0.0.0", port: port, responder: responder)
     }
 }
