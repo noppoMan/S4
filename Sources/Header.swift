@@ -49,6 +49,10 @@ extension Header: RangeReplaceableCollection, MutableCollection {
         return values.endIndex
     }
 
+    public func index(after i: Int) -> Int {
+        return i + 1
+    }
+
     public subscript(index: Int) -> String {
         get {
             return values[index]
