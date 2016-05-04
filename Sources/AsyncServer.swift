@@ -1,9 +1,10 @@
 public protocol AsyncServer {
-    func serve(_ responder: AsyncResponder, on host: String, at port: Int) throws
+    init(host: String, port: Int, responder: AsyncResponder) throws
+    func start() throws
 }
 
 extension AsyncServer {
-    public func serve(_ responder: AsyncResponder, at port: Int) throws {
-        try self.serve(responder, on: "0.0.0.0", at: port)
+    public init(port: Int, responder: AsyncResponder) throws {
+        try self.init(host: "0.0.0.0", port: port, responder: responder)
     }
 }
