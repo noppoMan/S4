@@ -1,14 +1,14 @@
 public protocol Responder: AsyncResponder {
-    func respond(request: Request) throws -> Response
+    func respond(to request: Request) throws -> Response
 }
 
 extension Responder {
-    public func respond(request: Request, result: (Void throws -> Response) -> Void) {
-        result { try self.respond(request) }
+    public func respond(to request: Request, result: (Void throws -> Response) -> Void) {
+        result { try self.respond(to: request) }
     }
 }
 
-public typealias Respond = Request throws -> Response
+public typealias Respond = (to: Request) throws -> Response
 
 public struct BasicResponder: Responder {
     let respond: Respond
@@ -17,7 +17,7 @@ public struct BasicResponder: Responder {
         self.respond = respond
     }
 
-    public func respond(request: Request) throws -> Response {
-        return try respond(request)
+    public func respond(to request: Request) throws -> Response {
+        return try self.respond(to: request)
     }
 }

@@ -1,14 +1,14 @@
 public struct Headers {
-    public var headers: [HeaderName: HeaderValues]
+    public var headers: [CaseInsensitiveString: Header]
 
-    public init(_ headers: [HeaderName: HeaderValues]) {
+    public init(_ headers: [CaseInsensitiveString: Header]) {
         self.headers = headers
     }
 }
 
 extension Headers: DictionaryLiteralConvertible {
-    public init(dictionaryLiteral elements: (HeaderName, HeaderValues)...) {
-        var headers: [HeaderName: HeaderValues] = [:]
+    public init(dictionaryLiteral elements: (CaseInsensitiveString, Header)...) {
+        var headers: [CaseInsensitiveString: Header] = [:]
 
         for (key, value) in elements {
             headers[key] = value
@@ -18,25 +18,13 @@ extension Headers: DictionaryLiteralConvertible {
     }
 }
 
-extension Headers: NilLiteralConvertible {
-    public init(nilLiteral: ()) {
-        self.headers = [:]
-    }
-}
-
-#if swift(>=3.0)
-extension Headers: Sequence {}
-#else
-extension Headers: SequenceType {}
-#endif
-
-extension Headers {
+extension Headers: Sequence {
     #if swift(>=3.0)
-    public func makeIterator() -> DictionaryIterator<HeaderName, HeaderValues> {
+    public func makeIterator() -> DictionaryIterator<CaseInsensitiveString, Header> {
         return headers.makeIterator()
     }
     #else
-    public func generate() -> DictionaryGenerator<HeaderName, HeaderValues> {
+    public func generate() -> DictionaryGenerator<CaseInsensitiveString, Header> {
         return headers.generate()
     }
     #endif
@@ -49,13 +37,23 @@ extension Headers {
         return headers.isEmpty
     }
 
-    public subscript(name: HeaderName) -> HeaderValues {
+    public subscript(field: CaseInsensitiveString) -> Header {
         get {
-            return headers[name] ?? nil
+            return headers[field] ?? []
         }
 
-        set(headerValues) {
-            headers[name] = headerValues
+        set(header) {
+            headers[field] = header
+        }
+    }
+
+    public subscript(field: CaseInsensitiveStringRepresentable) -> Header {
+        get {
+            return headers[field.caseInsensitiveString] ?? []
+        }
+
+        set(header) {
+            headers[field.caseInsensitiveString] = header
         }
     }
 }
