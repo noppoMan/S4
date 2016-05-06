@@ -1,3 +1,3 @@
 public protocol Client: Responder {
-    init(connectingTo uri: URI) throws
+    init(uri: URI) throws
 }

@@ -1,14 +1,16 @@
 public struct Response: Message {
     public var version: Version
     public var status: Status
-    public var headers: Headers
+    public var headers: [CaseInsensitiveString: String]
+    public var cookieHeaders: Set<String>
     public var body: Body
     public var storage: [String: Any] = [:]
 
-    public init(version: Version, status: Status, headers: Headers, body: Body) {
+    public init(version: Version, status: Status, headers: [CaseInsensitiveString: String], cookies: Set<String>, body: Body) {
         self.version = version
         self.status = status
         self.headers = headers
+        self.cookieHeaders = cookies
         self.body = body
     }
 }
@@ -24,33 +26,36 @@ public protocol ResponseRepresentable {
 public protocol ResponseConvertible: ResponseInitializable, ResponseRepresentable {}
 
 extension Response {
-    public init(status: Status = .ok, headers: Headers = [:], body: Data = []) {
+    public init(status: Status = .ok, headers: [CaseInsensitiveString: String] = [:], cookies: Set<String>, body: Data = []) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .buffer(body)
         )
 
         self.headers["Content-Length"] = body.count.description
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: Stream) {
+    public init(status: Status = .ok, headers: [CaseInsensitiveString: String] = [:], cookies: Set<String>, body: Stream) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .receiver(body)
         )
 
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: Stream throws -> Void) {
+    public init(status: Status = .ok, headers: [CaseInsensitiveString: String] = [:], cookies: Set<String>, body: Stream throws -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .sender(body)
         )
 

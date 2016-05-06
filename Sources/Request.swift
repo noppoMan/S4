@@ -2,11 +2,11 @@ public struct Request: Message {
     public var method: Method
     public var uri: URI
     public var version: Version
-    public var headers: Headers
+    public var headers: [CaseInsensitiveString: String]
     public var body: Body
     public var storage: [String: Any] = [:]
 
-    public init(method: Method, uri: URI, version: Version, headers: Headers, body: Body) {
+    public init(method: Method, uri: URI, version: Version, headers: [CaseInsensitiveString: String], body: Body) {
         self.method = method
         self.uri = uri
         self.version = version
@@ -26,7 +26,7 @@ public protocol RequestRepresentable {
 public protocol RequestConvertible: RequestInitializable, RequestRepresentable {}
 
 extension Request {
-    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Data = []) {
+    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: [CaseInsensitiveString: String] = [:], body: Data = []) {
         self.init(
             method: method,
             uri: uri,
@@ -38,7 +38,7 @@ extension Request {
         self.headers["Content-Length"] = body.count.description
     }
 
-    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Stream) {
+    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: [CaseInsensitiveString: String] = [:], body: Stream) {
         self.init(
             method: method,
             uri: uri,
@@ -50,7 +50,7 @@ extension Request {
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Stream throws -> Void) {
+    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: [CaseInsensitiveString: String] = [:], body: Stream throws -> Void) {
         self.init(
             method: method,
             uri: uri,
