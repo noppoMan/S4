@@ -62,9 +62,9 @@ class BodyTests: XCTestCase {
         let drain = Drain(for: self.data)
         let receiver = Body.receiver(drain)
         
-        let tasks: [[(Void -> Void) -> Void]] = [sender, receiver].map { body in
+        let tasks: [[((Void) -> Void) -> Void]] = [sender, receiver].map { body in
             var body = body
-            var tasks: [(Void -> Void) -> Void] = []
+            var tasks: [((Void) -> Void) -> Void] = []
             
             tasks.append({ next in
                 body.becomeAsyncSender {
@@ -157,7 +157,7 @@ class BodyTests: XCTestCase {
         var bodyForAsyncSender = body
         
         waitForExpectations(delay: 1, withDescription: "testAsyncBodyProperties") { done in
-            let asyncBufferTask: (Void -> Void) -> Void = { callback in
+            let asyncBufferTask: ((Void) -> Void) -> Void = { callback in
                 bodyForAsyncBuffer.asyncBecomeBuffer {
                     let (bodyForAsyncBuffer, d) = try! $0()
                     XCTAssert(self.data == d, "Garbled buffer bytes")
@@ -171,11 +171,11 @@ class BodyTests: XCTestCase {
                 }
             }
             
-            let asyncReceiverTask: (Void -> Void) -> Void = { callback in
+            let asyncReceiverTask: ((Void) -> Void) -> Void = { callback in
                 
                 bodyForAsyncReceiver.becomeAsyncReceiver {
                     var (bodyForAsyncReceiver, receiver) = try! $0()
-                    var tasks: [(Void -> Void) -> Void] = []
+                    var tasks: [((Void) -> Void) -> Void] = []
                     
                     tasks.append({ [unowned self] next in
                         
@@ -207,10 +207,10 @@ class BodyTests: XCTestCase {
                 }
             }
 
-            let asyncSenderTask: (Void -> Void) -> Void = { callback in
+            let asyncSenderTask: ((Void) -> Void) -> Void = { callback in
                 bodyForAsyncSender.becomeAsyncSender {
                     let (bodyForAsyncSender, sender) = try! $0()
-                    var tasks: [(Void -> Void) -> Void] = []
+                    var tasks: [((Void) -> Void) -> Void] = []
                     
                     tasks.append({ [unowned self] next in
                         bodyForAsyncReceiver.forceReopenAsyncDrain {
@@ -270,7 +270,7 @@ extension Body {
         }
     }
     
-    mutating func forceReopenAsyncDrain(completion: Void -> Void) {
+    mutating func forceReopenAsyncDrain(completion: (Void) -> Void) {
         self.becomeAsyncReceiver {
             let (_, stream) = try! $0()
             let drain = stream as! AsyncDrain

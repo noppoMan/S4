@@ -26,7 +26,7 @@ public enum Body {
     case receiver(Stream)
     case sender((Stream) throws -> Void)
     case asyncReceiver(AsyncStream)
-    case asyncSender((AsyncStream, (Void throws -> Void) -> Void) -> Void)
+    case asyncSender((AsyncStream, ((Void) throws -> Void) -> Void) -> Void)
 }
 
 public enum BodyError: ErrorProtocol {
@@ -120,7 +120,7 @@ extension Body {
         case .sender(let sender):
             return sender
         default:
-            let closure: (Stream throws -> Void) = { _ in
+            let closure: ((Stream) throws -> Void) = { _ in
                 throw BodyError.inconvertibleType
             }
             return closure
@@ -143,7 +143,7 @@ extension Body {
      If the body is a receiver, sender, asyncReceiver or asyncSender type,
      it will be drained.
      */
-    public mutating func asyncBecomeBuffer(timingOut deadline: Double = .never, completion: (Void throws -> (Body, Data)) -> Void) {
+    public mutating func asyncBecomeBuffer(timingOut deadline: Double = .never, completion: ((Void) throws -> (Body, Data)) -> Void) {
         switch self {
         case .asyncReceiver(let stream):
             _ = AsyncDrain(for: stream, timingOut: deadline) { closure in
@@ -184,7 +184,7 @@ extension Body {
      Converts the body's contents into a `AsyncStream`
      that can be received in chunks.
      */
-    public mutating func becomeAsyncReceiver(completion: (Void throws -> (Body, AsyncStream)) -> Void) {
+    public mutating func becomeAsyncReceiver(completion: ((Void) throws -> (Body, AsyncStream)) -> Void) {
         switch self {
         case .asyncReceiver(let stream):
             completion {
@@ -216,11 +216,11 @@ extension Body {
      Converts the body's contents into a closure
      that accepts a `AsyncStream`.
      */
-    public mutating func becomeAsyncSender(timingOut deadline: Double = .never, completion: (Void throws -> (Body, ((AsyncStream, (Void throws -> Void) -> Void) -> Void))) -> Void) {
+    public mutating func becomeAsyncSender(timingOut deadline: Double = .never, completion: ((Void) throws -> (Body, ((AsyncStream, ((Void) throws -> Void) -> Void) -> Void))) -> Void) {
         
         switch self {
         case .buffer(let data):
-            let closure: ((AsyncStream, (Void throws -> Void) -> Void) -> Void) = { sender, result in
+            let closure: ((AsyncStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
                 sender.send(data, timingOut: deadline) { closure in
                     result {
                         try closure()
@@ -232,7 +232,7 @@ extension Body {
                 return (self, closure)
             }
         case .asyncReceiver(let receiver):
-            let closure: ((AsyncStream, (Void throws -> Void) -> Void) -> Void) = { sender, result in
+            let closure: ((AsyncStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
                 _ = AsyncDrain(for: receiver, timingOut: deadline) {
                     do {
                         let drain = try $0()
