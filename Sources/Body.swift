@@ -233,9 +233,9 @@ extension Body {
             }
         case .asyncReceiver(let receiver):
             let closure: ((AsyncStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
-                _ = AsyncDrain(for: receiver, timingOut: deadline) {
+                _ = AsyncDrain(for: receiver, timingOut: deadline) { getData in
                     do {
-                        let drain = try $0()
+                        let drain = try getData()
                         sender.send(drain.data, timingOut: deadline, completion: result)
                     } catch {
                         result {
