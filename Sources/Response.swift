@@ -3,13 +3,16 @@ public struct Response: Message {
     public var status: Status
     public var headers: Headers
     public var body: Body
-    public var storage: [String: Any] = [:]
+    public var storage: [String: Any]
+    public var cookies: Set<Cookie>
 
     public init(version: Version, status: Status, headers: Headers, body: Body) {
         self.version = version
         self.status = status
         self.headers = headers
         self.body = body
+        self.storage = [:]
+        self.cookies = []
     }
 }
 

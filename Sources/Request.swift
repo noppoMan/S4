@@ -4,7 +4,8 @@ public struct Request: Message {
     public var version: Version
     public var headers: Headers
     public var body: Body
-    public var storage: [String: Any] = [:]
+    public var storage: [String: Any]
+    public var cookies: [String: String]
 
     public init(method: Method, uri: URI, version: Version, headers: Headers, body: Body) {
         self.method = method
@@ -12,6 +13,8 @@ public struct Request: Message {
         self.version = version
         self.headers = headers
         self.body = body
+        self.storage = [:]
+        self.cookies = [:]
     }
 }
 
