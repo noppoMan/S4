@@ -3,16 +3,16 @@ public struct Response: Message {
     public var status: Status
     public var headers: Headers
     public var body: Body
-    public var storage: [String: Any]
     public var cookies: Set<Cookie>
+    public var storage: [String: Any]
 
-    public init(version: Version, status: Status, headers: Headers, body: Body) {
+    public init(version: Version, status: Status, headers: Headers, body: Body, cookies: Set<Cookie>) {
         self.version = version
         self.status = status
         self.headers = headers
         self.body = body
+        self.cookies = cookies
         self.storage = [:]
-        self.cookies = []
     }
 }
 
@@ -27,34 +27,37 @@ public protocol ResponseRepresentable {
 public protocol ResponseConvertible: ResponseInitializable, ResponseRepresentable {}
 
 extension Response {
-    public init(status: Status = .ok, headers: Headers = [:], body: Data = []) {
+    public init(status: Status = .ok, headers: Headers = [:], body: Data = [], cookies: Set<Cookie>) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
-            body: .buffer(body)
+            body: .buffer(body),
+            cookies: cookies
         )
 
         self.headers["Content-Length"] += body.count.description
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: Stream) {
+    public init(status: Status = .ok, headers: Headers = [:], body: Stream, cookies: Set<Cookie>) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
-            body: .receiver(body)
+            body: .receiver(body),
+            cookies: cookies
         )
 
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: (Stream) throws -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], body: (Stream) throws -> Void, cookies: Set<Cookie>) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
-            body: .sender(body)
+            body: .sender(body),
+            cookies: cookies
         )
 
         self.headers["Transfer-Encoding"] = "chunked"
