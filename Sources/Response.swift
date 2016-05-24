@@ -3,10 +3,10 @@ public struct Response: Message {
     public var status: Status
     public var headers: Headers
     public var body: Body
-    public var cookies: Set<Cookie>
+    public var cookies: Cookies
     public var storage: [String: Any]
 
-    public init(version: Version, status: Status, headers: Headers, body: Body, cookies: Set<Cookie>) {
+    public init(version: Version, status: Status, headers: Headers, body: Body, cookies: Cookies) {
         self.version = version
         self.status = status
         self.headers = headers
@@ -27,7 +27,7 @@ public protocol ResponseRepresentable {
 public protocol ResponseConvertible: ResponseInitializable, ResponseRepresentable {}
 
 extension Response {
-    public init(status: Status = .ok, headers: Headers = [:], body: Data = [], cookies: Set<Cookie>) {
+    public init(status: Status = .ok, headers: Headers = [:], body: Data = [], cookies: Cookies) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -39,7 +39,7 @@ extension Response {
         self.headers["Content-Length"] += body.count.description
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: Stream, cookies: Set<Cookie>) {
+    public init(status: Status = .ok, headers: Headers = [:], body: Stream, cookies: Cookies) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -51,7 +51,7 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: (Stream) throws -> Void, cookies: Set<Cookie>) {
+    public init(status: Status = .ok, headers: Headers = [:], body: (Stream) throws -> Void, cookies: Cookies) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
