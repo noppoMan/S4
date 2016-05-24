@@ -1,12 +1,12 @@
 public struct Response: Message {
     public var version: Version
     public var status: Status
-    public var headers: [CaseInsensitiveString: String]
+    public var headers: Headers
     public var cookieHeaders: Set<String>
     public var body: Body
     public var storage: [String: Any] = [:]
 
-    public init(version: Version, status: Status, headers: [CaseInsensitiveString: String], cookies: Set<String>, body: Body) {
+    public init(version: Version, status: Status, headers: Headers, cookies: Set<String>, body: Body) {
         self.version = version
         self.status = status
         self.headers = headers
@@ -26,7 +26,7 @@ public protocol ResponseRepresentable {
 public protocol ResponseConvertible: ResponseInitializable, ResponseRepresentable {}
 
 extension Response {
-    public init(status: Status = .ok, headers: [CaseInsensitiveString: String] = [:], cookies: Set<String>, body: Data = []) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: Data = []) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -38,7 +38,7 @@ extension Response {
         self.headers["Content-Length"] = body.count.description
     }
 
-    public init(status: Status = .ok, headers: [CaseInsensitiveString: String] = [:], cookies: Set<String>, body: Stream) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: Stream) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -50,7 +50,7 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: [CaseInsensitiveString: String] = [:], cookies: Set<String>, body: Stream throws -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: Stream throws -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
