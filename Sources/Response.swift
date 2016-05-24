@@ -50,7 +50,7 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: Stream throws -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: (Stream) throws -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
