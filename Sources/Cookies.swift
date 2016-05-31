@@ -52,6 +52,12 @@ public struct Cookies {
     }
 }
 
+extension Cookies: ArrayLiteralConvertible {
+    public init(arrayLiteral cookies: Cookie...) {
+        self.init(cookies: cookies)
+    }
+}
+
 extension Cookies: Sequence {
     public typealias Iterator = SetIterator<Cookie>
 
