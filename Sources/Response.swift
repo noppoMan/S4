@@ -74,7 +74,7 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
     
-    public init(status: Status = .ok, headers: Headers = [:], body: (AsyncStream, ((Void) throws -> Void) -> Void) -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], body: (AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
