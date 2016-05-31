@@ -61,4 +61,28 @@ extension Request {
 
         self.headers["Transfer-Encoding"] = "chunked"
     }
+    
+    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: AsyncStream) {
+        self.init(
+            method: method,
+            uri: uri,
+            version: Version(major: 1, minor: 1),
+            headers: headers,
+            body: .asyncReceiver(body)
+        )
+        
+        self.headers["Transfer-Encoding"] = "chunked"
+    }
+    
+    public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: (AsyncStream, ((Void) throws -> Void) -> Void) -> Void) {
+        self.init(
+            method: method,
+            uri: uri,
+            version: Version(major: 1, minor: 1),
+            headers: headers,
+            body: .asyncSender(body)
+        )
+        
+        self.headers["Transfer-Encoding"] = "chunked"
+    }
 }
