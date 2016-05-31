@@ -26,7 +26,7 @@ public protocol ResponseRepresentable {
 public protocol ResponseConvertible: ResponseInitializable, ResponseRepresentable {}
 
 extension Response {
-    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: Data = []) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String> = [], body: Data = []) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -38,7 +38,7 @@ extension Response {
         self.headers["Content-Length"] = body.count.description
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: Stream) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String> = [], body: Stream) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -50,7 +50,7 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: (SendingStream) throws -> Void, cookies: Set<String>) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: (SendingStream) throws -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -62,22 +62,24 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
     
-    public init(status: Status = .ok, headers: Headers = [:], body: AsyncStream) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: AsyncStream) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .asyncReceiver(body)
         )
         
         self.headers["Transfer-Encoding"] = "chunked"
     }
     
-    public init(status: Status = .ok, headers: Headers = [:], body: (AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Set<String>, body: (AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .asyncSender(body)
         )
         
