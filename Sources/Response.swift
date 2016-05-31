@@ -51,7 +51,7 @@ extension Response {
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: (Stream) throws -> Void, cookies: Cookies) {
+    public init(status: Status = .ok, headers: Headers = [:], body: (SendingStream) throws -> Void, cookies: Cookies) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
@@ -60,6 +60,28 @@ extension Response {
             cookies: cookies
         )
 
+        self.headers["Transfer-Encoding"] = "chunked"
+    }
+    
+    public init(status: Status = .ok, headers: Headers = [:], body: AsyncStream) {
+        self.init(
+            version: Version(major: 1, minor: 1),
+            status: status,
+            headers: headers,
+            body: .asyncReceiver(body)
+        )
+        
+        self.headers["Transfer-Encoding"] = "chunked"
+    }
+    
+    public init(status: Status = .ok, headers: Headers = [:], body: (AsyncStream, ((Void) throws -> Void) -> Void) -> Void) {
+        self.init(
+            version: Version(major: 1, minor: 1),
+            status: status,
+            headers: headers,
+            body: .asyncSender(body)
+        )
+        
         self.headers["Transfer-Encoding"] = "chunked"
     }
 }
