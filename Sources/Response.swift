@@ -3,13 +3,16 @@ public struct Response: Message {
     public var status: Status
     public var headers: Headers
     public var body: Body
-    public var storage: [String: Any] = [:]
+    public var cookies: Cookies
+    public var storage: [String: Any]
 
-    public init(version: Version, status: Status, headers: Headers, body: Body) {
+    public init(version: Version, status: Status, headers: Headers, cookies: Cookies, body: Body) {
         self.version = version
         self.status = status
         self.headers = headers
+        self.cookies = cookies
         self.body = body
+        self.storage = [:]
     }
 }
 
@@ -24,55 +27,60 @@ public protocol ResponseRepresentable {
 public protocol ResponseConvertible: ResponseInitializable, ResponseRepresentable {}
 
 extension Response {
-    public init(status: Status = .ok, headers: Headers = [:], body: Data = []) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Cookies = [], body: Data = []) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .buffer(body)
         )
 
         self.headers["Content-Length"] += body.count.description
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: Stream) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Cookies = [], body: Stream) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .receiver(body)
         )
 
         self.headers["Transfer-Encoding"] = "chunked"
     }
 
-    public init(status: Status = .ok, headers: Headers = [:], body: (SendingStream) throws -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Cookies = [], body: (SendingStream) throws -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .sender(body)
         )
 
         self.headers["Transfer-Encoding"] = "chunked"
     }
     
-    public init(status: Status = .ok, headers: Headers = [:], body: AsyncStream) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Cookies = [], body: AsyncStream) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .asyncReceiver(body)
         )
         
         self.headers["Transfer-Encoding"] = "chunked"
     }
     
-    public init(status: Status = .ok, headers: Headers = [:], body: (AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) {
+    public init(status: Status = .ok, headers: Headers = [:], cookies: Cookies = [], body: (AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) {
         self.init(
             version: Version(major: 1, minor: 1),
             status: status,
             headers: headers,
+            cookies: cookies,
             body: .asyncSender(body)
         )
         
