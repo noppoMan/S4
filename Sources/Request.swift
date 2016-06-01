@@ -18,7 +18,7 @@ public struct Request: Message {
 
 extension Request {
     public var cookies: [String: String] {
-        guard let string = headers["cookie"].first else {
+        guard let string = headers["cookie"] else {
             return [:]
         }
 
