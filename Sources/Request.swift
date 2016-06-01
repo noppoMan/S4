@@ -18,7 +18,7 @@ public struct Request: Message {
 
 extension Request {
     public var cookies: [String: String] {
-        guard let string = headers["cookie"].first else {
+        guard let string = headers["cookie"] else {
             return [:]
         }
 
@@ -63,7 +63,7 @@ extension Request {
             body: .buffer(body)
         )
 
-        self.headers["Content-Length"] += body.count.description
+        self.headers["Content-Length"] = body.count.description
     }
 
     public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: Stream) {

@@ -2,17 +2,16 @@ public struct Response: Message {
     public var version: Version
     public var status: Status
     public var headers: Headers
-    public var body: Body
     public var cookies: Cookies
-    public var storage: [String: Any]
+    public var body: Body
+    public var storage: [String: Any] = [:]
 
-    public init(version: Version, status: Status, headers: Headers, cookies: Cookies, body: Body) {
+    public init(version: Version, status: Status, headers: Headers, cookies: Cookies = [], body: Body) {
         self.version = version
         self.status = status
         self.headers = headers
         self.cookies = cookies
         self.body = body
-        self.storage = [:]
     }
 }
 
@@ -36,7 +35,7 @@ extension Response {
             body: .buffer(body)
         )
 
-        self.headers["Content-Length"] += body.count.description
+        self.headers["Content-Length"] = body.count.description
     }
 
     public init(status: Status = .ok, headers: Headers = [:], cookies: Cookies = [], body: Stream) {
