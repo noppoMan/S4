@@ -16,33 +16,6 @@ public struct Request: Message {
     }
 }
 
-extension Request {
-    public var cookies: [String: String] {
-        guard let string = headers["cookie"] else {
-            return [:]
-        }
-
-        var cookies: [String : String] = [:]
-
-        let tokens = string.characters.split(separator: ";")
-
-        for token in tokens {
-            let cookieTokens = token.split(separator: "=", maxSplits: 1)
-
-            guard cookieTokens.count == 2 else {
-                continue
-            }
-
-            let name = String(cookieTokens[0])
-            let value = String(cookieTokens[1])
-
-            cookies[name] = value
-        }
-        
-        return cookies
-    }
-}
-
 public protocol RequestInitializable {
     init(request: Request)
 }
@@ -89,7 +62,7 @@ extension Request {
 
         self.headers["Transfer-Encoding"] = "chunked"
     }
-    
+
     public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: AsyncStream) {
         self.init(
             method: method,
@@ -98,10 +71,10 @@ extension Request {
             headers: headers,
             body: .asyncReceiver(body)
         )
-        
+
         self.headers["Transfer-Encoding"] = "chunked"
     }
-    
+
     public init(method: Method = .get, uri: URI = URI(path: "/"), headers: Headers = [:], body: (AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) {
         self.init(
             method: method,
@@ -110,7 +83,7 @@ extension Request {
             headers: headers,
             body: .asyncSender(body)
         )
-        
+
         self.headers["Transfer-Encoding"] = "chunked"
     }
 }
