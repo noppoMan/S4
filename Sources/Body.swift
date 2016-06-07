@@ -137,39 +137,39 @@ extension Body {
 }
 
 extension Body {
-    /**
-     Converts the body's contents into a `Data` buffer asynchronously.
-     
-     If the body is a receiver, sender, asyncReceiver or asyncSender type,
-     it will be drained.
-     */
-    public mutating func asyncBecomeBuffer(timingOut deadline: Double = .never, completion: ((Void) throws -> (Body, Data)) -> Void) {
-        switch self {
-        case .asyncReceiver(let stream):
-            _ = AsyncDrain(for: stream, timingOut: deadline) { closure in
-                completion {
-                    let drain = try closure ()
-                    self = .buffer(drain.data)
-                    return (self, drain.data)
-                }
-            }
-            
-        case .asyncSender(let sender):
-            let drain = AsyncDrain()
-            sender(drain) { closure in
-                completion {
-                    try closure()
-                    self = .buffer(drain.data)
-                    return (self, drain.data)
-                }
-            }
-        default:
-            completion {
-                let data = try self.becomeBuffer(timingOut: deadline)
-                return (self, data)
-            }
-        }
-    }
+//    /**
+//     Converts the body's contents into a `Data` buffer asynchronously.
+//     
+//     If the body is a receiver, sender, asyncReceiver or asyncSender type,
+//     it will be drained.
+//     */
+//    public mutating func asyncBecomeBuffer(timingOut deadline: Double = .never, completion: ((Void) throws -> (Body, Data)) -> Void) {
+//        switch self {
+//        case .asyncReceiver(let stream):
+//            _ = AsyncDrain(for: stream, timingOut: deadline) { closure in
+//                completion {
+//                    let drain = try closure ()
+//                    self = .buffer(drain.data)
+//                    return (self, drain.data)
+//                }
+//            }
+//            
+//        case .asyncSender(let sender):
+//            let drain = AsyncDrain()
+//            sender(drain) { closure in
+//                completion {
+//                    try closure()
+//                    self = .buffer(drain.data)
+//                    return (self, drain.data)
+//                }
+//            }
+//        default:
+//            completion {
+//                let data = try self.becomeBuffer(timingOut: deadline)
+//                return (self, data)
+//            }
+//        }
+//    }
     
     ///Returns true if body is case `asyncReceiver`
     public var isAsyncReceiver: Bool {
@@ -179,86 +179,86 @@ extension Body {
         }
     }
     
-    
-    /**
-     Converts the body's contents into a `AsyncReceivingStream`
-     that can be received in chunks.
-     */
-    public mutating func becomeAsyncReceiver(completion: ((Void) throws -> (Body, AsyncReceivingStream)) -> Void) {
-        switch self {
-        case .asyncReceiver(let stream):
-            completion {
-                (self, stream)
-            }
-        case .buffer(let data):
-            let stream = AsyncDrain(for: data)
-            self = .asyncReceiver(stream)
-            completion {
-                (self, stream)
-            }
-        case .asyncSender(let sender):
-            let stream = AsyncDrain()
-            sender(stream) { closure in
-                completion {
-                    try closure()
-                    self = .asyncReceiver(stream)
-                    return (self, stream)
-                }
-            }
-        default:
-            completion {
-                throw BodyError.inconvertibleType
-            }
-        }
-    }
-    
-    /**
-     Converts the body's contents into a closure
-     that accepts a `AsyncSendingStream`.
-     */
-    public mutating func becomeAsyncSender(timingOut deadline: Double = .never, completion: ((Void) throws -> (Body, ((AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void))) -> Void) {
-        
-        switch self {
-        case .buffer(let data):
-            let closure: ((AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
-                sender.send(data, timingOut: deadline) { closure in
-                    result {
-                        try closure()
-                    }
-                }
-            }
-            completion {
-                self = .asyncSender(closure)
-                return (self, closure)
-            }
-        case .asyncReceiver(let receiver):
-            let closure: ((AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
-                _ = AsyncDrain(for: receiver, timingOut: deadline) { getData in
-                    do {
-                        let drain = try getData()
-                        sender.send(drain.data, timingOut: deadline, completion: result)
-                    } catch {
-                        result {
-                            throw error
-                        }
-                    }
-                }
-            }
-            completion {
-                self = .asyncSender(closure)
-                return (self, closure)
-            }
-        case .asyncSender(let closure):
-            completion {
-                (self, closure)
-            }
-        default:
-            completion {
-                throw BodyError.inconvertibleType
-            }
-        }
-    }
-    
+//
+//    /**
+//     Converts the body's contents into a `AsyncReceivingStream`
+//     that can be received in chunks.
+//     */
+//    public mutating func becomeAsyncReceiver(completion: ((Void) throws -> (Body, AsyncReceivingStream)) -> Void) {
+//        switch self {
+//        case .asyncReceiver(let stream):
+//            completion {
+//                (self, stream)
+//            }
+//        case .buffer(let data):
+//            let stream = AsyncDrain(for: data)
+//            self = .asyncReceiver(stream)
+//            completion {
+//                (self, stream)
+//            }
+//        case .asyncSender(let sender):
+//            let stream = AsyncDrain()
+//            sender(stream) { closure in
+//                completion {
+//                    try closure()
+//                    self = .asyncReceiver(stream)
+//                    return (self, stream)
+//                }
+//            }
+//        default:
+//            completion {
+//                throw BodyError.inconvertibleType
+//            }
+//        }
+//    }
+//    
+//    /**
+//     Converts the body's contents into a closure
+//     that accepts a `AsyncSendingStream`.
+//     */
+//    public mutating func becomeAsyncSender(timingOut deadline: Double = .never, completion: ((Void) throws -> (Body, ((AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void))) -> Void) {
+//        
+//        switch self {
+//        case .buffer(let data):
+//            let closure: ((AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
+//                sender.send(data, timingOut: deadline) { closure in
+//                    result {
+//                        try closure()
+//                    }
+//                }
+//            }
+//            completion {
+//                self = .asyncSender(closure)
+//                return (self, closure)
+//            }
+//        case .asyncReceiver(let receiver):
+//            let closure: ((AsyncSendingStream, ((Void) throws -> Void) -> Void) -> Void) = { sender, result in
+//                _ = AsyncDrain(for: receiver, timingOut: deadline) { getData in
+//                    do {
+//                        let drain = try getData()
+//                        sender.send(drain.data, timingOut: deadline, completion: result)
+//                    } catch {
+//                        result {
+//                            throw error
+//                        }
+//                    }
+//                }
+//            }
+//            completion {
+//                self = .asyncSender(closure)
+//                return (self, closure)
+//            }
+//        case .asyncSender(let closure):
+//            completion {
+//                (self, closure)
+//            }
+//        default:
+//            completion {
+//                throw BodyError.inconvertibleType
+//            }
+//        }
+//    }
+//    
     ///Returns true if body is case `asyncSender`
     public var isAsyncSender: Bool {
         switch self {
