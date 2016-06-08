@@ -1,3 +1,3 @@
 public protocol ResponseParser {
-    func parse(from stream: Stream) throws -> Response
+    func parse(_ stream: Stream) throws -> Response
 }
