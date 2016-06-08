@@ -1,3 +1,3 @@
 public protocol RequestParser {
-    func parse(from stream: Stream, completion: @noescape (Request) -> Void) throws
+    func parse(from stream: Stream) throws -> Request
 }
