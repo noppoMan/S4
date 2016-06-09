@@ -9,7 +9,7 @@ class RequestTests: XCTestCase {
     }
 
     func testCookies() {
-        let request = Request(headers: ["Cookie": "test=123;other-cookie=321"])
+        let request = Request(method: .get, uri: URI(), version: Version(major: 1, minor: 1), headers: ["Cookie": "test=123;other-cookie=321"], body: .buffer([]))
 
         XCTAssert(request.cookies["test"] == "123", "Cookies did not parse")
         XCTAssert(request.cookies["other-cookie"] == "321", "Cookies did not parse")
