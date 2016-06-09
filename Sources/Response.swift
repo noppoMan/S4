@@ -6,7 +6,7 @@ public struct Response: Message {
     public var body: Body
     public var storage: [String: Any] = [:]
 
-    public init(version: Version, status: Status, headers: Headers, cookieHeaders: Set<String> = [], body: Body) {
+    public init(version: Version, status: Status, headers: Headers, cookieHeaders: Set<String>, body: Body) {
         self.version = version
         self.status = status
         self.headers = headers
