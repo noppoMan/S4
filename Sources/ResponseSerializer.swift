@@ -1,3 +1,4 @@
 public protocol ResponseSerializer {
-    func serialize(_ response: Response, to stream: Stream) throws
+    init(stream: Stream)
+    func serialize(_ response: Response) throws
 }
