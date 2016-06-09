@@ -1,20 +1,28 @@
 public struct Headers {
     public var headers: [CaseInsensitiveString: String]
+    public var cookies: Set<String>
 
     public init(_ headers: [CaseInsensitiveString: String]) {
         self.headers = headers
+        self.cookies = []
     }
 }
 
 extension Headers: DictionaryLiteralConvertible {
     public init(dictionaryLiteral elements: (CaseInsensitiveString, String)...) {
         var headers: [CaseInsensitiveString: String] = [:]
+        var cookies: Set<String> = []
 
         for (key, value) in elements {
-            headers[key] = value
+            if key == "set-cookie" {
+                cookies.insert(value)
+            } else {
+                headers[key] = value
+            }
         }
 
         self.headers = headers
+        self.cookies = cookies
     }
 }
 
@@ -35,16 +43,6 @@ extension Headers: Sequence {
 
     public var isEmpty: Bool {
         return headers.isEmpty
-    }
-
-    public subscript(field: CaseInsensitiveString) -> String? {
-        get {
-            return headers[field]
-        }
-
-        set(header) {
-            headers[field] = header
-        }
     }
 
     public subscript(field: CaseInsensitiveStringRepresentable) -> String? {
