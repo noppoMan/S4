@@ -1,3 +1,4 @@
 public protocol RequestSerializer {
-    func serialize(_ request: Request, to stream: Stream) throws
+    init(stream: Stream)
+    func serialize(_ request: Request) throws
 }
