@@ -57,9 +57,6 @@ extension Body {
         default: return false
         }
     }
-}
-
-extension Body {
 
     ///Returns true if body is case `asyncReceiver`
     public var isAsyncReceiver: Bool {
