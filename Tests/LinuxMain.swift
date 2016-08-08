@@ -1,7 +1,7 @@
 #if os(Linux)
 
 import XCTest
-@testable import S4TestSuite
+@testable import S4Tests
 
 XCTMain([
     testCase(ExampleTests.allTests),
