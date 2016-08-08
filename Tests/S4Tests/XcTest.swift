@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 
 extension XCTestCase {
-    class func series(tasks asyncTasks: [((Void) -> Void) -> Void], completion: (Void) -> Void) {
+    class func series(tasks asyncTasks: [((Void) -> Void) -> Void], completion: @escaping (Void) -> Void) {
         var index = 0
         func _series(_ current: (((Void) -> Void) -> Void)) {
             current {
